@@ -1,4 +1,6 @@
+from tabnanny import verbose
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
 
 
@@ -82,7 +84,6 @@ class Product(models.Model):
         max_length=200,
         blank=True,
     )
-
     objects = ProductQuerySet.as_manager()
 
     class Meta:
@@ -121,3 +122,57 @@ class RestaurantMenuItem(models.Model):
 
     def __str__(self):
         return f"{self.restaurant.name} - {self.product.name}"
+
+
+class Order(models.Model):
+    address = models.CharField(
+        'Адрес',
+        max_length=150,
+        db_index=True,
+    )
+    name = models.CharField(
+        'Имя',
+        max_length=50,
+        db_index=True,
+    )
+    last_name = models.CharField(
+        'Фамилия',
+        max_length=50,
+        db_index=True,
+    )
+    phone = PhoneNumberField(
+        'Телефон',
+        region='RU',
+        db_index=True,
+    )
+
+    class Meta:
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
+
+    def __str__(self):
+        return self.name
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order,
+        verbose_name='Заказ',
+        related_name='order_items',
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    product = models.ForeignKey(
+        Product,
+        verbose_name='Товар',
+        related_name='product_items',
+        on_delete=models.CASCADE,
+    )
+    amount = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'Пункт заказа'
+        verbose_name_plural = 'Пункты заказа'
+
+    def __str__(self):
+        return f'{self.product.name} {self.order.name} {self.order.address}'
