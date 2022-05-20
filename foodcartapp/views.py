@@ -2,6 +2,9 @@ import json
 from django.http import JsonResponse
 from django.templatetags.static import static
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 
 from .models import Product, Order, OrderItem
 
@@ -29,7 +32,7 @@ def banners_list_api(request):
         'indent': 4,
     })
 
-
+@api_view(['GET'])
 def product_list_api(request):
     products = Product.objects.select_related('category').available()
 
@@ -52,14 +55,11 @@ def product_list_api(request):
             }
         }
         dumped_products.append(dumped_product)
-    return JsonResponse(dumped_products, safe=False, json_dumps_params={
-        'ensure_ascii': False,
-        'indent': 4,
-    })
+    return Response(dumped_products)
 
-
+@api_view(['POST'])
 def register_order(request):
-    order_items = json.loads(request.body.decode())
+    order_items = request.data
     order = Order.objects.create(
         name=order_items['firstname'],
         last_name=order_items['lastname'],
