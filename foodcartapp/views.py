@@ -1,4 +1,5 @@
-import json
+import phonenumbers
+from django.db.utils import IntegrityError
 from django.http import JsonResponse
 from django.templatetags.static import static
 
@@ -62,14 +63,18 @@ def product_list_api(request):
 
 @api_view(['POST'])
 def register_order(request):
-    order_items = request.data
-    order = Order.objects.create(
-        name=order_items['firstname'],
-        last_name=order_items['lastname'],
-        phone=order_items['phonenumber'],
-        address=order_items['address'],
-    )
     try:
+        order_items = request.data
+        name = order_items['firstname']
+        if not isinstance(name, str):
+            return Response({'error': 'name: Not a valid string'})
+        phone = phonenumbers.parse(order_items['phonenumber'], 'RU')
+        order = Order.objects.create(
+            name=name,
+            last_name=order_items['lastname'],
+            phone=phone,
+            address=order_items['address'],
+        )
         order_products = order_items['products']
         if not order_products:
             return Response({'error': 'products: Этот список не может быть пустым.'})
@@ -80,8 +85,14 @@ def register_order(request):
                 product=product,
                 amount=order_product['quantity']
             )
-        return Response()
+        return Response({})
+    except Product.DoesNotExist as error:
+        return Response({'error': f'{error}'})
+    except phonenumbers.phonenumberutil.NumberParseException as error:
+        return Response({'error': f'{error}'})
+    except IntegrityError as error:
+        return Response({'error': f'{error}'})
     except TypeError as error:
         return Response({'error': f'{error}'})
-    except KeyError:
-        return Response({'error': 'products: Обязательное поле.'})
+    except KeyError as error:
+        return Response({'error': f'Not key {error}'})
