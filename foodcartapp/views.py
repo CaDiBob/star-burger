@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.templatetags.static import static
 
 from rest_framework.decorators import api_view
+from rest_framework import status
 from rest_framework.response import Response
 
 
@@ -32,6 +33,7 @@ def banners_list_api(request):
         'indent': 4,
     })
 
+
 @api_view(['GET'])
 def product_list_api(request):
     products = Product.objects.select_related('category').available()
@@ -57,6 +59,7 @@ def product_list_api(request):
         dumped_products.append(dumped_product)
     return Response(dumped_products)
 
+
 @api_view(['POST'])
 def register_order(request):
     order_items = request.data
@@ -66,12 +69,19 @@ def register_order(request):
         phone=order_items['phonenumber'],
         address=order_items['address'],
     )
-    order_products = order_items['products']
-    for order_product in order_products:
-        product = Product.objects.get(id=order_product['product'])
-        OrderItem.objects.update_or_create(
-            order=order,
-            product=product,
-            amount=order_product['quantity']
-        )
-    return JsonResponse({})
+    try:
+        order_products = order_items['products']
+        if not order_products:
+            return Response({'error': 'products: Этот список не может быть пустым.'})
+        for order_product in order_products:
+            product = Product.objects.get(id=order_product['product'])
+            OrderItem.objects.update_or_create(
+                order=order,
+                product=product,
+                amount=order_product['quantity']
+            )
+        return Response()
+    except TypeError as error:
+        return Response({'error': f'{error}'})
+    except KeyError:
+        return Response({'error': 'products: Обязательное поле.'})
