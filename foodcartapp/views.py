@@ -1,3 +1,5 @@
+from itertools import product
+from xml.dom import ValidationErr
 import phonenumbers
 from django.db.utils import IntegrityError
 from django.http import JsonResponse
@@ -6,6 +8,13 @@ from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
+
+from rest_framework.serializers import Serializer
+from rest_framework.serializers import CharField
+
+from rest_framework.serializers import ValidationError
+from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ListField
 
 
 from .models import Product, Order, OrderItem
@@ -61,38 +70,40 @@ def product_list_api(request):
     return Response(dumped_products)
 
 
+class OrderItemSerializer(ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['product', 'amount']
+
+
+class OrderSerializer(ModelSerializer):
+    products = OrderItemSerializer(many=True, allow_empty=False)
+
+    class Meta:
+        model = Order
+        fields = ['address', 'firstname',
+                  'lastname', 'phonenumber', 'products']
+
+
 @api_view(['POST'])
 def register_order(request):
-    try:
-        order_items = request.data
-        name = order_items['firstname']
-        if not isinstance(name, str):
-            return Response({'error': 'name: Not a valid string'})
-        phone = phonenumbers.parse(order_items['phonenumber'], 'RU')
-        order = Order.objects.create(
-            name=name,
-            last_name=order_items['lastname'],
-            phone=phone,
-            address=order_items['address'],
+    serializer = OrderSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    order_items = serializer.validated_data
+    firstname = order_items['firstname']
+    phone = phonenumbers.parse(order_items['phonenumber'], 'RU')
+    order = Order.objects.create(
+        firstname=firstname,
+        lastname=order_items['lastname'],
+        phonenumber=phone,
+        address=order_items['address'],
+    )
+    order_products = order_items['products']
+    for order_product in order_products:
+        product = Product.objects.get(id=order_product['product'])
+        OrderItem.objects.update_or_create(
+            order=order,
+            product=product,
+            amount=order_product['quantity']
         )
-        order_products = order_items['products']
-        if not order_products:
-            return Response({'error': 'products: Этот список не может быть пустым.'})
-        for order_product in order_products:
-            product = Product.objects.get(id=order_product['product'])
-            OrderItem.objects.update_or_create(
-                order=order,
-                product=product,
-                amount=order_product['quantity']
-            )
-        return Response({})
-    except Product.DoesNotExist as error:
-        return Response({'error': f'{error}'})
-    except phonenumbers.phonenumberutil.NumberParseException as error:
-        return Response({'error': f'{error}'})
-    except IntegrityError as error:
-        return Response({'error': f'{error}'})
-    except TypeError as error:
-        return Response({'error': f'{error}'})
-    except KeyError as error:
-        return Response({'error': f'Not key {error}'})
+    return Response({})
