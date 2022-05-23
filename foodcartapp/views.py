@@ -9,15 +9,27 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 
-from rest_framework.serializers import Serializer
-from rest_framework.serializers import CharField
 
-from rest_framework.serializers import ValidationError
 from rest_framework.serializers import ModelSerializer
-from rest_framework.serializers import ListField
 
 
 from .models import Product, Order, OrderItem
+
+
+class OrderItemSerializer(ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['product',]
+
+
+class OrderSerializer(ModelSerializer):
+    products = OrderItemSerializer(many=True, allow_empty=False)
+
+    class Meta:
+        model = Order
+        fields = [
+            'address', 'firstname', 'lastname', 'phonenumber', 'products'
+        ]
 
 
 def banners_list_api(request):
@@ -70,26 +82,11 @@ def product_list_api(request):
     return Response(dumped_products)
 
 
-class OrderItemSerializer(ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = ['product', 'amount']
-
-
-class OrderSerializer(ModelSerializer):
-    products = OrderItemSerializer(many=True, allow_empty=False)
-
-    class Meta:
-        model = Order
-        fields = ['address', 'firstname',
-                  'lastname', 'phonenumber', 'products']
-
-
 @api_view(['POST'])
 def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    order_items = serializer.validated_data
+    order_items = request.data
     firstname = order_items['firstname']
     phone = phonenumbers.parse(order_items['phonenumber'], 'RU')
     order = Order.objects.create(
