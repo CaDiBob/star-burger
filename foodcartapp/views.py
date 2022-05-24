@@ -1,37 +1,10 @@
-from itertools import product
-from sys import float_repr_style
-from tkinter import SW
-from xml.dom import ValidationErr
-import phonenumbers
-from django.db.utils import IntegrityError
 from django.http import JsonResponse
 from django.templatetags.static import static
-
 from rest_framework.decorators import api_view
-from rest_framework import status
 from rest_framework.response import Response
 
-
-from rest_framework.serializers import ModelSerializer
-
-
-from .models import Product, Order, OrderItem
-
-
-class OrderItemSerializer(ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = ['product', ]
-
-
-class OrderSerializer(ModelSerializer):
-    products = OrderItemSerializer(many=True, allow_empty=False, write_only=True)
-
-    class Meta:
-        model = Order
-        fields = [
-            'id', 'address', 'firstname', 'lastname', 'phonenumber', 'products'
-        ]
+from .models import Order, OrderItem, Product
+from .serializers import OrderSerializer
 
 
 def banners_list_api(request):
@@ -107,5 +80,6 @@ def register_order(request):
             product=product,
             amount=order_product['quantity']
         )
-    serializer = OrderSerializer(order)
-    return Response(serializer.data)
+    serializ_order = OrderSerializer(order)
+    answer = serializ_order.data
+    return Response(answer)
