@@ -1,4 +1,6 @@
 from itertools import product
+from sys import float_repr_style
+from tkinter import SW
 from xml.dom import ValidationErr
 import phonenumbers
 from django.db.utils import IntegrityError
@@ -19,16 +21,16 @@ from .models import Product, Order, OrderItem
 class OrderItemSerializer(ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ['product',]
+        fields = ['product', ]
 
 
 class OrderSerializer(ModelSerializer):
-    products = OrderItemSerializer(many=True, allow_empty=False)
+    products = OrderItemSerializer(many=True, allow_empty=False, write_only=True)
 
     class Meta:
         model = Order
         fields = [
-            'address', 'firstname', 'lastname', 'phonenumber', 'products'
+            'id', 'address', 'firstname', 'lastname', 'phonenumber', 'products'
         ]
 
 
@@ -87,13 +89,15 @@ def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     order_items = request.data
-    firstname = order_items['firstname']
-    phone = phonenumbers.parse(order_items['phonenumber'], 'RU')
+    firstname = serializer.validated_data['firstname']
+    phone = serializer.validated_data['phonenumber']
+    lastname = serializer.validated_data['lastname']
+    address = serializer.validated_data['address']
     order = Order.objects.create(
         firstname=firstname,
-        lastname=order_items['lastname'],
+        lastname=lastname,
         phonenumber=phone,
-        address=order_items['address'],
+        address=address,
     )
     order_products = order_items['products']
     for order_product in order_products:
@@ -103,4 +107,5 @@ def register_order(request):
             product=product,
             amount=order_product['quantity']
         )
-    return Response({})
+    serializer = OrderSerializer(order)
+    return Response(serializer.data)
