@@ -36,7 +36,6 @@ class ProductQuerySet(models.QuerySet):
         )
         return self.filter(pk__in=products)
 
-
 class ProductCategory(models.Model):
     name = models.CharField(
         'название',
@@ -123,6 +122,17 @@ class RestaurantMenuItem(models.Model):
         return f"{self.restaurant.name} - {self.product.name}"
 
 
+class OrderQuerySet(models.QuerySet):
+
+    def get_amount_order(self):
+        for order in self:
+            prices_in_order = [
+                item.product.price * item.quantity for item in order.order_items.all()
+            ]
+            order.amount_order = sum(prices_in_order)
+        return self
+
+
 class Order(models.Model):
     address = models.CharField(
         'Адрес',
@@ -144,6 +154,7 @@ class Order(models.Model):
         region='RU',
         db_index=True,
     )
+    objects = OrderQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'Заказ'
@@ -166,7 +177,7 @@ class OrderItem(models.Model):
         related_name='product_items',
         on_delete=models.CASCADE,
     )
-    amount = models.IntegerField('Количество')
+    quantity = models.IntegerField('Количество')
 
     class Meta:
         verbose_name = 'Пункт заказа'
