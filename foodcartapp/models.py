@@ -1,6 +1,7 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
+from django.db.models import F, Sum
 
 
 class Restaurant(models.Model):
@@ -125,12 +126,10 @@ class RestaurantMenuItem(models.Model):
 class OrderQuerySet(models.QuerySet):
 
     def get_amount_order(self):
-        for order in self:
-            prices_in_order = [
-                item.product.price * item.quantity for item in order.order_items.all()
-            ]
-            order.amount_order = sum(prices_in_order)
-        return self
+        amount_order = self.annotate(
+            amount=Sum(F('order_items__quantity') * F('order_items__product__price'))
+        )
+        return amount_order
 
 
 class Order(models.Model):
