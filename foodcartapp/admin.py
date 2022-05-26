@@ -1,8 +1,9 @@
 from atexit import register
 from django.contrib import admin
-from django.shortcuts import reverse
+from django.shortcuts import reverse, redirect
 from django.templatetags.static import static
 from django.utils.html import format_html
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .models import Order
 from .models import OrderItem
@@ -111,7 +112,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    extra = 0
+    extra = 1
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):

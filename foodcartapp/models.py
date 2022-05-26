@@ -37,6 +37,7 @@ class ProductQuerySet(models.QuerySet):
         )
         return self.filter(pk__in=products)
 
+
 class ProductCategory(models.Model):
     name = models.CharField(
         'название',
@@ -127,7 +128,8 @@ class OrderQuerySet(models.QuerySet):
 
     def get_amount_order(self):
         amount_order = self.annotate(
-            amount=Sum(F('order_items__quantity') * F('order_items__product__price'))
+            amount=Sum(F('order_items__quantity') *
+                       F('order_items__product__price'))
         )
         return amount_order
 
@@ -177,6 +179,13 @@ class OrderItem(models.Model):
         on_delete=models.CASCADE,
     )
     quantity = models.IntegerField('Количество')
+    price = models.DecimalField(
+        'Цена',
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        null=True,
+    )
 
     class Meta:
         verbose_name = 'Пункт заказа'
