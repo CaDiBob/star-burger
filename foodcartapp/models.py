@@ -144,6 +144,7 @@ class Order(models.Model):
         max_length=150,
         db_index=True,
     )
+    commentary = models.TextField('Комментарий', blank=True)
     firstname = models.CharField(
         'Имя',
         max_length=50,

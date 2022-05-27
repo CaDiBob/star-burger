@@ -18,25 +18,26 @@
       <th>Клиент</th>
       <th>Телефон</th>
       <th>Адрес доставки</th>
-      <th>Стоимость</th>
+      <th>Комментарий</th>
       <th>Действия</th>
+      <th>Стоимость</th>
     </tr>
 
   {% for order in orders %}
+    <tr>
     {% if order.order_status == 'unprocessed' %}
-      <tr>
-        <td>{{order.id}}</td>
-        <td>{{order.get_order_status_display}}</td>
-        <td>{{order.id}}</td>
-        <td>{{order.firstname}} {{order.lastname}}</td>
-        <td>{{order.phonenumber}}</td>
-        <td>{{order.address}}</td>
-        <td>{{order.amount}}</td>
-        <td>
-          <a href="{% url 'admin:foodcartapp_order_change' order.id %}?next={{ request.get_full_path|urlencode  }}">Редактировать</a>
-        </td>
-      </tr>
+      <td>{{order.id}}</td>
+      <td>{{order.get_order_status_display}}</td>
+      <td>{{order.firstname}} {{order.lastname}}</td>
+      <td>{{order.phonenumber}}</td>
+      <td>{{order.address}}</td>
+      <td>{{order.commentary}}</td>
+      <td>
+        <a href="{% url 'admin:foodcartapp_order_change' order.id %}?next={{ request.get_full_path|urlencode  }}">Редактировать</a>
+      </td>
+      <td>{{order.amount}}</td>
     {% endif %}
+    </tr>
   {% endfor %}
    </table>
   </div>
