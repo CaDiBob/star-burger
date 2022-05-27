@@ -58,7 +58,7 @@ def product_list_api(request):
     return Response(dumped_products)
 
 
-# @transaction.atomic
+@transaction.atomic
 @api_view(['POST'])
 def register_order(request):
     serializer = OrderSerializer(data=request.data)
