@@ -1,3 +1,4 @@
+from tokenize import blank_re
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
@@ -140,6 +141,10 @@ class Order(models.Model):
         ('unprocessed', 'Необработанный'),
         ('processed', 'Обработанный'),
     )
+    PAYMENT_METHOD = (
+        ('cashless', 'Безналичный'),
+        ('cash', 'Наличные'),
+    )
     address = models.CharField(
         'Адрес',
         max_length=150,
@@ -185,6 +190,13 @@ class Order(models.Model):
         null=True,
         db_index=True,
     )
+    payment_method = models.CharField(
+        'Способ оплаты',
+        max_length=12,
+        blank=True,
+        choices=PAYMENT_METHOD,
+        db_index=True,
+    )
 
     objects = OrderQuerySet.as_manager()
 
@@ -215,7 +227,7 @@ class OrderItem(models.Model):
         max_digits=8,
         decimal_places=2,
         validators=[MinValueValidator(0)],
-        null=True,
+        blank=True,
     )
 
     class Meta:
