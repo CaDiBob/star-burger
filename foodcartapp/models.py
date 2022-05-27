@@ -135,6 +135,10 @@ class OrderQuerySet(models.QuerySet):
 
 
 class Order(models.Model):
+    ORDER_STATUS = (
+        ('unprocessed', 'Необработанный'),
+        ('processed', 'Обработанный'),
+    )
     address = models.CharField(
         'Адрес',
         max_length=150,
@@ -153,6 +157,13 @@ class Order(models.Model):
     phonenumber = PhoneNumberField(
         'Телефон',
         region='RU',
+        db_index=True,
+    )
+    order_status = models.CharField(
+        'Статус',
+        max_length=12,
+        choices=ORDER_STATUS,
+        default='unprocessed',
         db_index=True,
     )
     objects = OrderQuerySet.as_manager()
