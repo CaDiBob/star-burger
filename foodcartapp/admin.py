@@ -1,4 +1,3 @@
-from atexit import register
 from django.contrib import admin
 from django.shortcuts import reverse, redirect
 
@@ -115,14 +114,18 @@ class ProductAdmin(admin.ModelAdmin):
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    extra = 1
+    extra = 0
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'firstname',
     ]
-    inlines = [OrderItemInline]
+    save_on_top = True
+    inlines = [
+        OrderItemInline,
+    ]
+
 
     def response_change(self, request, obj):
         res = super(OrderAdmin, self).response_change(request, obj)

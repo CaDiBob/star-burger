@@ -6,10 +6,10 @@ from django.contrib.auth.decorators import user_passes_test
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-from django.db.models import F, Sum
+from collections import defaultdict
 
 
-from foodcartapp.models import OrderItem, Product, Restaurant, Order
+from foodcartapp.models import OrderItem, Product, Restaurant, Order, RestaurantMenuItem
 
 
 class Login(forms.Form):
@@ -99,6 +99,21 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.get_amount_order()
+    orders = Order.objects.get_amount_order().prefetch_related('order_items__product')
+    menu_items = RestaurantMenuItem.objects.select_related('restaurant', 'product')
+
+    restaurants_with_products = defaultdict(list)
+    for menu_item in menu_items:
+        restaurants_with_products[menu_item.product].append(menu_item.restaurant)
+    for order in orders:
+        order_products = list()
+        products = order.order_items.all()
+        for product in products:
+            order_products.append(restaurants_with_products[product.product])
+        order_restaurants = set.intersection(
+            *map(set, order_products)
+        )
+        order.restourant_with_product = order_restaurants
+
     context = {'orders': orders}
     return render(request, template_name='order_items.html', context=context)

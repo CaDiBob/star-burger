@@ -1,9 +1,11 @@
+from tkinter import CASCADE
 from tokenize import blank_re
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
 from django.db.models import F, Sum
 from django.utils import timezone
+from collections import defaultdict
 
 
 class Restaurant(models.Model):
@@ -197,7 +199,14 @@ class Order(models.Model):
         choices=PAYMENT_METHOD,
         db_index=True,
     )
-
+    restaurant = models.ForeignKey(
+        Restaurant,
+        verbose_name='Ресторан',
+        related_name='restorans',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     objects = OrderQuerySet.as_manager()
 
     class Meta:
@@ -228,6 +237,7 @@ class OrderItem(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0)],
         blank=True,
+        null=True,
     )
 
     class Meta:

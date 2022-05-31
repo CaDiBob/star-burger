@@ -22,6 +22,7 @@
       <th>Комментарий</th>
       <th>Действия</th>
       <th>Стоимость</th>
+      <th>Рестораны</th>
     </tr>
 
   {% for order in orders %}
@@ -38,6 +39,24 @@
         <a href="{% url 'admin:foodcartapp_order_change' order.id %}?next={{ request.get_full_path|urlencode  }}">Редактировать</a>
       </td>
       <td>{{order.amount}}</td>
+      <td>
+        <details>
+          <summary>Информация</summary>
+          {% if not order.restaurant %}
+            {% if order.restourant_with_product %}
+              {% for res in order.restourant_with_product %}
+                <p>Может быть приготовлен в</p>
+                  <p>{{res}}</p>
+              {% endfor %}
+            {% else %}
+              <p>Нет подходящего ресторана</p>
+            {% endif %}
+          {% else %}
+            <p>Готовит</p>
+            <p>{{order.restaurant}}</p>
+          {% endif %}
+        </details>
+      </td>
     {% endif %}
     </tr>
   {% endfor %}
