@@ -43,10 +43,10 @@
         <details>
           <summary>Информация</summary>
           {% if not order.restaurant %}
-            {% if order.restourant_with_product %}
-              {% for res in order.restourant_with_product %}
+            {% if order.restaurant_with_product %}
+              {% for restaurant in order.restaurant_with_product %}
                 <p>Может быть приготовлен в</p>
-                  <p>{{res}}</p>
+                  <p>{{restaurant}} - {{restaurant.distance_for_order}} км.</p>
               {% endfor %}
             {% else %}
               <p>Нет подходящего ресторана</p>
