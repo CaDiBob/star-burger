@@ -1,11 +1,8 @@
-from tkinter import CASCADE
-from tokenize import blank_re
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
 from django.db.models import F, Sum
 from django.utils import timezone
-from collections import defaultdict
 
 
 class Restaurant(models.Model):

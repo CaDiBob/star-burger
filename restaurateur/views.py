@@ -1,6 +1,3 @@
-import requests
-from geopy import distance
-from django.conf import settings
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
@@ -11,8 +8,16 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from collections import defaultdict
 
-
-from foodcartapp.models import OrderItem, Product, Restaurant, Order, RestaurantMenuItem
+from foodcartapp.models import (
+    Product,
+    Restaurant,
+    Order,
+    RestaurantMenuItem
+)
+from locationdata.location_tools import (
+    get_distance,
+    get_locations,
+)
 
 
 class Login(forms.Form):
@@ -100,40 +105,25 @@ def view_restaurants(request):
     })
 
 
-def fetch_coordinates(address):
-    base_url = 'https://geocode-maps.yandex.ru/1.x'
-    response = requests.get(base_url, params={
-        'geocode': address,
-        'apikey': settings.YANDEX_GEOCODER_API,
-        'format': 'json',
-    })
-    response.raise_for_status()
-    found_places = response.json()['response']['GeoObjectCollection']['featureMember']
-
-    if not found_places:
-        return None
-
-    most_relevant = found_places[0]
-    lon, lat = most_relevant['GeoObject']['Point']['pos'].split(' ')
-    return lat, lon
-
-
-def get_distance(order):
-    order_coordinates = fetch_coordinates(order.address)
-    for restaurant in order.restaurant_with_product:
-        restaurant_coordinates = fetch_coordinates(restaurant.address)
-        restaurant.distance_for_order = round(distance.distance(order_coordinates, restaurant_coordinates).km, 3)
-
-
-
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.get_amount_order().prefetch_related('order_items__product', 'order_items__order').filter(order_status='unprocessed')
-    menu_items = RestaurantMenuItem.objects.select_related('restaurant', 'product')
+    orders = Order.objects.get_amount_order().prefetch_related(
+        'order_items__product').filter(order_status='unprocessed')
+    menu_items = RestaurantMenuItem.objects.select_related(
+        'restaurant', 'product')
+
+    order_addresses = [order.address for order in orders]
+    restaurant_addresses = list(set([
+        restaurant.restaurant.address for restaurant in menu_items
+    ]))
+    locations = get_locations(
+        *order_addresses, *restaurant_addresses
+    )
 
     restaurants_with_products = defaultdict(list)
     for menu_item in menu_items:
-        restaurants_with_products[menu_item.product].append(menu_item.restaurant)
+        restaurants_with_products[menu_item.product].append(
+            menu_item.restaurant)
     for order in orders:
 
         order_products = list()
@@ -144,6 +134,7 @@ def view_orders(request):
             *map(set, order_products)
         )
         order.restaurant_with_product = order_restaurants
-        get_distance(order)
+        get_distance(order, locations)
+
     context = {'orders': orders}
     return render(request, template_name='order_items.html', context=context)
