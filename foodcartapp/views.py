@@ -75,13 +75,16 @@ def register_order(request):
         address=address,
     )
     order_products = order_items['products']
+    order_elements = list()
     for order_product in order_products:
         product = Product.objects.get(id=order_product['product'])
-        OrderItem.objects.update_or_create(
+        order_element = OrderItem(
             order=order,
             product=product,
             quantity=order_product['quantity']
         )
+        order_elements.append(order_element)
+    OrderItem.objects.bulk_create(order_elements)
     serializ_order = OrderSerializer(order)
     answer = serializ_order.data
     return Response(answer)
