@@ -43,13 +43,14 @@ def get_locations(*addresses):
         if address in locations.keys():
             continue
         coordinates = fetch_coordinates(address)
-        lat, lon = coordinates
-        location = Location(
-            address=address,
-            lat=lat,
-            lon=lon,
-        )
-        locations[location.address] = (location.lat, location.lon,)
-        new_locations.append(location)
+        if coordinates:
+            lat, lon = coordinates
+            location = Location(
+                address=address,
+                lat=lat,
+                lon=lon,
+            )
+            locations[location.address] = (location.lat, location.lon,)
+            new_locations.append(location)
     Location.objects.bulk_create(new_locations)
     return locations
