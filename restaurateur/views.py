@@ -107,8 +107,8 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.get_amount_order().prefetch_related(
-        'order_items__product').filter(order_status='unprocessed')
+    orders = Order.objects.get_order_amount().prefetch_related(
+        'elements__product').filter(order_status='unprocessed')
     menu_items = RestaurantMenuItem.objects.select_related(
         'restaurant', 'product')
 
@@ -127,7 +127,7 @@ def view_orders(request):
     for order in orders:
 
         order_products = list()
-        products = order.order_items.all()
+        products = order.elements.all()
         for product in products:
             order_products.append(restaurants_with_products[product.product])
         order_restaurants = set.intersection(

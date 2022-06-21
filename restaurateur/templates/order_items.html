@@ -42,7 +42,7 @@
       <td>
         <details>
           <summary>Информация</summary>
-          {% if not order.restaurant %}
+          {% if not order.restaurant_with_order %}
             {% if order.restaurant_with_product %}
               <p>Может быть приготовлен:</p>
                 {% for restaurant in order.restaurant_with_product %}

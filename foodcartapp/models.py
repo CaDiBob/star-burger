@@ -127,10 +127,10 @@ class RestaurantMenuItem(models.Model):
 
 class OrderQuerySet(models.QuerySet):
 
-    def get_amount_order(self):
+    def get_order_amount(self):
         amount_order = self.annotate(
-            amount=Sum(F('order_items__quantity') *
-                       F('order_items__product__price'))
+            amount=Sum(F('elements__quantity') *
+                       F('elements__product__price'))
         )
         return amount_order
 
@@ -196,7 +196,7 @@ class Order(models.Model):
         choices=PAYMENT_METHOD,
         db_index=True,
     )
-    restaurant = models.ForeignKey(
+    restaurant_with_order = models.ForeignKey(
         Restaurant,
         verbose_name='Ресторан',
         related_name='restorans',
@@ -218,22 +218,24 @@ class OrderItem(models.Model):
     order = models.ForeignKey(
         Order,
         verbose_name='Заказ',
-        related_name='order_items',
+        related_name='elements',
         on_delete=models.CASCADE,
     )
     product = models.ForeignKey(
         Product,
         verbose_name='Товар',
-        related_name='product_items',
+        related_name='in_orders',
         on_delete=models.CASCADE,
     )
-    quantity = models.IntegerField('Количество')
+    quantity = models.IntegerField(
+        'Количество',
+        validators=[MinValueValidator(1)]
+    )
     price = models.DecimalField(
         'Цена',
         max_digits=8,
         decimal_places=2,
         validators=[MinValueValidator(0)],
-        blank=True,
         null=True,
     )
 
