@@ -5,8 +5,8 @@ from django.db import migrations
 
 def set_product_price(apps, shema_editor):
     OrderItem = apps.get_model('foodcartapp', 'OrderItem')
-    for order in OrderItem.objects.all():
-        order.price=order.product.price
+    for order in OrderItem.objects.iterator():
+        order.price = order.product.price
         order.save()
 
 
