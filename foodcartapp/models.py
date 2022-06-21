@@ -3,6 +3,11 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MinValueValidator
 from django.db.models import F, Sum
 from django.utils import timezone
+from collections import defaultdict
+from locationdata.location_tools import (
+    get_distance,
+    get_locations,
+)
 
 
 class Restaurant(models.Model):
@@ -133,6 +138,35 @@ class OrderQuerySet(models.QuerySet):
                        F('elements__product__price'))
         )
         return amount_order
+
+    def get_resaurants_with_product(self):
+        menu_items = RestaurantMenuItem.objects.select_related(
+            'restaurant', 'product')
+        order_addresses = [order.address for order in self]
+        restaurant_addresses = list(set([
+            restaurant.restaurant.address for restaurant in menu_items
+        ]))
+        locations = get_locations(
+            *order_addresses, *restaurant_addresses
+        )
+        restaurants_with_products = defaultdict(list)
+        for menu_item in menu_items:
+            restaurants_with_products[menu_item.product].append(
+                menu_item.restaurant)
+        for order in self:
+
+            order_products = list()
+            products = order.elements.all()
+            for product in products:
+                order_products.append(
+                    restaurants_with_products[product.product]
+                )
+            order_restaurants = set.intersection(
+                *map(set, order_products)
+            )
+            order.restaurant_with_product = order_restaurants
+            get_distance(order, locations)
+        return self
 
 
 class Order(models.Model):

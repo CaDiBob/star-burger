@@ -108,33 +108,7 @@ def view_restaurants(request):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
     orders = Order.objects.get_order_amount().prefetch_related(
-        'elements__product').filter(order_status='unprocessed')
-    menu_items = RestaurantMenuItem.objects.select_related(
-        'restaurant', 'product')
-
-    order_addresses = [order.address for order in orders]
-    restaurant_addresses = list(set([
-        restaurant.restaurant.address for restaurant in menu_items
-    ]))
-    locations = get_locations(
-        *order_addresses, *restaurant_addresses
-    )
-
-    restaurants_with_products = defaultdict(list)
-    for menu_item in menu_items:
-        restaurants_with_products[menu_item.product].append(
-            menu_item.restaurant)
-    for order in orders:
-
-        order_products = list()
-        products = order.elements.all()
-        for product in products:
-            order_products.append(restaurants_with_products[product.product])
-        order_restaurants = set.intersection(
-            *map(set, order_products)
-        )
-        order.restaurant_with_product = order_restaurants
-        get_distance(order, locations)
-
+        'elements__product'
+    ).filter(order_status='unprocessed').get_resaurants_with_product()
     context = {'orders': orders}
     return render(request, template_name='order_items.html', context=context)
