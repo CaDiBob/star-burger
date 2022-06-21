@@ -43,8 +43,6 @@ def get_locations(*addresses):
         if address in locations.keys():
             continue
         coordinates = fetch_coordinates(address)
-        if not coordinates:
-            continue
         lat, lon = coordinates
         location = Location(
             address=address,
