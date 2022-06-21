@@ -11,7 +11,11 @@ class Location(models.Model):
     )
     lat = models.FloatField('Широта', db_index=True, blank=True)
     lon = models.FloatField('Долгота', db_index=True, blank=True)
-    created_at = models.DateField('Дата', default=timezone.now, db_index=True)
+    creation_date = models.DateField(
+        'Дата добавления записи',
+        default=timezone.now,
+        db_index=True
+    )
 
     class Meta:
         verbose_name = 'Местоположение зказа'
