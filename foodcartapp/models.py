@@ -134,8 +134,8 @@ class OrderQuerySet(models.QuerySet):
 
     def get_order_amount(self):
         amount_order = self.annotate(
-            amount=Sum(F('elements__quantity') *
-                       F('elements__product__price'))
+            amount=Sum(F('items__quantity') *
+                       F('items__product__price'))
         )
         return amount_order
 
@@ -156,7 +156,7 @@ class OrderQuerySet(models.QuerySet):
         for order in self:
 
             order_products = list()
-            products = order.elements.all()
+            products = order.items.all()
             for product in products:
                 order_products.append(
                     restaurants_with_products[product.product]
@@ -252,13 +252,13 @@ class OrderItem(models.Model):
     order = models.ForeignKey(
         Order,
         verbose_name='Заказ',
-        related_name='elements',
+        related_name='items',
         on_delete=models.CASCADE,
     )
     product = models.ForeignKey(
         Product,
         verbose_name='Товар',
-        related_name='in_orders',
+        related_name='items',
         on_delete=models.CASCADE,
     )
     quantity = models.IntegerField(

@@ -108,7 +108,7 @@ def view_restaurants(request):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
     orders = Order.objects.get_order_amount().prefetch_related(
-        'elements__product'
+        'items__product'
     ).filter(order_status='unprocessed').get_resaurants_with_product()
     context = {'orders': orders}
     return render(request, template_name='order_items.html', context=context)
