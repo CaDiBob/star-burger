@@ -37,12 +37,13 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
+rollbar_access_token = env('ROLLBAR_ACCESS_TOKEN')
+environment = env('ENVIRONMENT')
 ROLLBAR = {
-    'access_token': env.str('ROLLBAR_ACCESS_TOKEN'),
-    'environment': env.str('ENVIRONMENT'),
+    'access_token': rollbar_access_token,
+    'environment': environment,
     'root': BASE_DIR,
 }
-
 rollbar.init(**ROLLBAR)
 
 MIDDLEWARE = [
@@ -99,9 +100,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
-    )
+        "default": env.dj_db_url("DATABASE_URL"),
 }
 
 AUTH_PASSWORD_VALIDATORS = [
