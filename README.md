@@ -155,6 +155,7 @@ Parcel будет следить за файлами в каталоге `bundle
 - `YANDEX_GEOCODER_API=` - Ваш ключ к API [Яндекс_гекодер](https://yandex.ru/dev/maps/geocoder/)
 - `ROLLBAR_ACCESS_TOKEN`=Ваш токен POST_SERVER_ITEM
 - `ENVIRONMENT`= Тип версии сайта (prod или разработческая)
+- `DATABASE_URL`=postgres://логин:пароль@адрес_хоста:порт/имя
 
 ## Цели проекта
 
