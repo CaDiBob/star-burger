@@ -19,7 +19,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = env.list(
-    'ALLOWED_HOSTS', ['127.0.0.1', 'localhost',  '77.223.97.56']
+    'ALLOWED_HOSTS', ['127.0.0.1', 'localhost', '77.223.97.56', 'cadburger.tk',]
 )
 
 INSTALLED_APPS = [
