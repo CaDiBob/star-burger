@@ -37,13 +37,13 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
-if not DEBUG:
-    ROLLBAR = {
-        'access_token': env('ROLLBAR_ACCESS_TOKEN'),
-        'environment': env('ENVIRONMENT'),
-        'root': BASE_DIR,
-    }
-    rollbar.init(**ROLLBAR)
+
+ROLLBAR = {
+    'access_token': env('ROLLBAR_ACCESS_TOKEN', 'empty'),
+    'environment': env('ENVIRONMENT', 'dev'),
+    'root': BASE_DIR,
+}
+rollbar.init(**ROLLBAR)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
