@@ -4,7 +4,7 @@ git pull
 npm ci --dev
 ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 /home/cad/star-burger/venv/bin/python3 manage.py collectstatic --noinput
-/home/cad/star-burger/venv/bin/python3 manage.py migrate
+/home/cad/star-burger/venv/bin/python3 manage.py migrate --noinput
 
 sudo systemctl daemon-reload
 sudo systemctl restart www.service
