@@ -1,7 +1,7 @@
 FROM node:18
-WORKDIR /frontend
-COPY ./package.json .
-COPY ./package-lock.json .
+WORKDIR /code/frontend
+COPY ./package.json /code/frontend/package.json
+COPY ./package-lock.json /code/frontend/package-lock.json
 RUN npm ci --dev
 RUN npm install
-COPY . .
+COPY . /code/frontend
