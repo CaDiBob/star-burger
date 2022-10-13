@@ -19,7 +19,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = env.list(
-    'ALLOWED_HOSTS', ['127.0.0.1', 'localhost', '77.223.97.56', 'cadburger.tk',]
+    'ALLOWED_HOSTS', ['127.0.0.1', 'localhost']
 )
 
 INSTALLED_APPS = [
@@ -136,7 +136,7 @@ INTERNAL_IPS = [
 ]
 
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "assets"),
-    os.path.join(BASE_DIR, "bundles"),
-]
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "assets"),
+#     os.path.join(BASE_DIR, "bundles"),
+# ]
