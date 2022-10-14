@@ -5,7 +5,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.front
-      restart: always
     volumes_from:
       - web:rw
   web:

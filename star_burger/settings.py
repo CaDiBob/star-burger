@@ -136,7 +136,7 @@ INTERNAL_IPS = [
 ]
 
 
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "assets"),
-#     os.path.join(BASE_DIR, "bundles"),
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "assets"),
+    os.path.join(BASE_DIR, "bundles"),
+]
