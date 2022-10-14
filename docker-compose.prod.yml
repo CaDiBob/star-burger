@@ -1,6 +1,12 @@
 version: '3.7'
 
 services:
+  front:
+    build:
+      context: .
+      dockerfile: Dockerfile.front
+    volumes:
+      -./:/usr/src/app/
   web:
     build:
       context: .
