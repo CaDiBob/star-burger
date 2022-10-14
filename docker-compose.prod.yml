@@ -5,8 +5,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.front
-    volumes:
-      -./:/usr/src/app/
+      restart: always
+    volumes_from:
+      - web:rw
   web:
     build:
       context: .
