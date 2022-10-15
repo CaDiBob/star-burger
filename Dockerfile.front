@@ -1,5 +1,5 @@
 FROM node:lts
-ARG APP_DIR=frontend
+ARG APP_DIR=/usr/src/app/front
 RUN mkdir -p ${APP_DIR}
 WORKDIR ${APP_DIR}
 
