@@ -3,7 +3,7 @@ version: '3.7'
 services:
   front:
     build:
-      context: ./front
+      context: .
       dockerfile: Dockerfile.front
     container_name: burger_front
     command: ./node_modules/.bin/parcel build ./bundles-src/index.js --dist-dir ./bundles --public-url "./"
