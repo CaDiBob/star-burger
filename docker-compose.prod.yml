@@ -6,9 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile.front
     container_name: burger_front
-    command: ./node_modules/.bin/parcel build ./bundles-src/index.js --dist-dir ./bundles --public-url "./"
-    volumes_from:
-      - web:rw
+    volumes:
+      - app_volume:/usr/src/app/front
   web:
     build:
       context: .
@@ -16,7 +15,7 @@ services:
     container_name: burger_back
     command: sh -c "gunicorn star_burger.wsgi:application --bind 0.0.0.0:8000"
     volumes:
-      - ./:/usr/src/app/
+      - app_volume:/usr/src/app/
       - static_volume:/usr/src/app/staticfiles
       - media_volume:/usr/src/app/media
     expose:
@@ -39,6 +38,7 @@ services:
     env_file:
       - ./.env
 volumes:
+  app_volume:
   static_volume:
   media_volume:
   postgres_volume:
