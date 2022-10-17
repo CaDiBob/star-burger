@@ -3,19 +3,17 @@ version: '3.7'
 services:
   front:
     build:
-      context: ./front
+      context: .
       dockerfile: Dockerfile.front
     container_name: burger_front
     volumes:
       - app_volume:/usr/src/app/front
-    volumes_from:
-      - web:rw
   web:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    command: sh -c "python manage.py migrate       --noinput                             &&
-                    gunicorn star_burger.wsgi:application --bind 0.0.0.0:8000"
+    container_name: burger_back
+    command: sh -c "gunicorn star_burger.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - app_volume:/usr/src/app/
       - static_volume:/usr/src/app/staticfiles
