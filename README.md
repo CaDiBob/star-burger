@@ -159,6 +159,21 @@ Parcel будет следить за файлами в каталоге `bundle
 - `ENVIRONMENT`= Тип версии сайта (prod или разработческая)
 - `DATABASE_URL`=postgres://логин:пароль@адрес_хоста:порт/имя
 
+### Запуск  с использованием docker-compose
+
+[Docker и Docker-compose](https://docs.docker.com/get-docker/) должены быть установлены.
+##### Для разработки
+
+```bash
+sudo docker-compose up -d --build
+```
+
+##### Для прода
+
+```bash
+sudo docker-compose -f docker-compose.prod.yaml up -d --build
+```
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
