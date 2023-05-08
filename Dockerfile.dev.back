@@ -10,7 +10,8 @@ EXPOSE 8000
 
 RUN apk update \
 && apk add jpeg-dev zlib-dev \
-postgresql-client build-base postgresql-dev
+postgresql-client build-base postgresql-dev \
+&& rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -20,7 +21,3 @@ RUN pip install -r /temp/requirements.txt
 
 RUN adduser --disabled-password user
 USER user
-
-RUN mkdir front
-
-COPY . .

@@ -1,0 +1,10 @@
+ARG NODEJS_VERSION=16
+
+FROM node:${NODEJS_VERSION}-buster-slim
+
+WORKDIR /app
+
+COPY ./assets/ /app
+COPY ./package.json /app
+COPY ./package-lock.json /app
+COPY ./bundles-src /app

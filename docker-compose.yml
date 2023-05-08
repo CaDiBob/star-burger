@@ -2,11 +2,40 @@ version: '3.7'
 
 services:
   web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    build:
+      context: .
+      dockerfile: Dockerfile.dev.back
+    command: sh -c "python manage.py migrate --noinput &&
+                    python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ./:/usr/src/app/
+      - ./:/app
     ports:
-      - 8000:8000
+      - 8001:8000
+    expose:
+      - 8000
     env_file:
       - ./.env
+    depends_on:
+      - front
+      - db
+
+  db:
+    image: postgres:14.0-alpine
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+
+  front:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev.front
+    command: sh -c 'npm ci --include=dev &&
+                  ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"'
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+
+volumes:
+  postgres_volume:

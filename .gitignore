@@ -1,3 +1,5 @@
+*.xlsx
+*.xls
 bundles/**
 node_modules/
 media/
@@ -144,3 +146,4 @@ cython_debug/
 .parcel-cache/
 .vscode/launch.json
 .idea
+.env-prod
