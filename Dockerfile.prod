@@ -1,26 +1,17 @@
 FROM python:3.10-alpine
 
-RUN mkdir app
-
-COPY . /app
-
 WORKDIR /app
-
-EXPOSE 8000
-
-RUN apk update \
-&& apk add jpeg-dev zlib-dev \
-postgresql-client build-base postgresql-dev
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+
+RUN apk update \
+&& apk add jpeg-dev zlib-dev \
+postgresql-client build-base postgresql-dev \
+&& rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /temp/requirements.txt
 RUN pip install -r /temp/requirements.txt
 
 RUN adduser --disabled-password user
 USER user
-
-RUN mkdir front
-
-COPY . .

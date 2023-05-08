@@ -5,11 +5,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.front
-    command: sh -c 'npm ci --include=dev &&
-                  ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"'
     container_name: burger_front
     volumes:
-      - app_volume:/app
+      - app_volume:/usr/src/app/front
   web:
     build:
       context: .
@@ -19,21 +17,18 @@ services:
                     python manage.py migrate       --noinput                             &&
                     gunicorn star_burger.wsgi:application --bind 127.0.0.1:8000"
     volumes:
-      - app_volume:/app
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      - app_volume:/usr/src/app/
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/media
     expose:
       - 8000
     env_file:
       - ./.env
-    depends_on:
-      - front
-      - db
   nginx:
     build: ./nginx
     volumes:
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/media
     ports:
       - 80:80
     depends_on:
