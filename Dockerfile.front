@@ -2,9 +2,14 @@ ARG NODEJS_VERSION=16
 
 FROM node:${NODEJS_VERSION}-buster-slim
 
-WORKDIR /app
+WORKDIR /app/
 
-COPY ./assets/ /app
-COPY ./package.json /app
-COPY ./package-lock.json /app
-COPY ./bundles-src /app
+COPY ./assets/ /assets/
+COPY ./package.json package.json
+COPY ./package-lock.json package-lock.json
+
+RUN npm ci --include=dev
+
+COPY ./bundles-src ./bundles-src
+
+RUN ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
